@@ -36,18 +36,20 @@ packages:
   connectivity_plus:
     dependency: transitive
     description:
-      name: connectivity_plus
-      sha256: "224a77051d52a11fbad53dd57827594d3bd24f945af28bd70bab376d68d437f0"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "6557e79dcba8483533c518b25dfd34112d1a931a"
+      url: "https://github.com/kumsumit/connectivity_plus.git"
+    source: git
     version: "5.0.2"
   connectivity_plus_platform_interface:
     dependency: transitive
     description:
-      name: connectivity_plus_platform_interface
-      sha256: cf1d1c28f4416f8c654d7dc3cd638ec586076255d407cef3ddbdaf178272a71a
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "9ed245c3363c4fc77b27de9ee6b4b0a28d79ca4e"
+      url: "https://github.com/kumsumit/connectivity_plus_platform_interface.git"
+    source: git
     version: "1.2.4"
   dbus:
     dependency: transitive
@@ -106,14 +108,6 @@ packages:
       relative: true
     source: path
     version: "2.2.0"
-  js:
-    dependency: transitive
-    description:
-      name: js
-      sha256: f2c445dce49627136094980615a031419f7f3eb393237e4ecd97ac15dea343f3
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.6.7"
   lints:
     dependency: transitive
     description:
@@ -165,10 +159,11 @@ packages:
   plugin_platform_interface:
     dependency: transitive
     description:
-      name: plugin_platform_interface
-      sha256: "4820fbfdb9478b1ebae27888254d445073732dae3d6ea81f0b7e06d5dedc3f02"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "0258f99fc7505eebfc1332998552f585cb27751d"
+      url: "https://github.com/kumsumit/plugin_platform_interface.git"
+    source: git
     version: "2.1.8"
   sky_engine:
     dependency: transitive
