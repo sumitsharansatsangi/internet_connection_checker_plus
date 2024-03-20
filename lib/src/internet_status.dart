@@ -1,11 +1,12 @@
-part of internet_connection_checker_plus;
+part of '../internet_connection_checker_plus.dart';
 
 /// Enum representing the status of internet connectivity.
 ///
 /// This enum defines two possible values to represent the status of internet
 /// connectivity: `connected` and `disconnected`.
 ///
-/// Usage example:
+/// *Usage Example:*
+///
 /// ```dart
 /// if (status == InternetStatus.connected) {
 ///   print('Internet is available!');

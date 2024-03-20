@@ -1,4 +1,4 @@
-part of internet_connection_checker_plus;
+part of '../internet_connection_checker_plus.dart';
 
 /// A utility class for checking internet connectivity status.
 ///
@@ -66,7 +66,7 @@ class InternetConnection {
   ///
   /// The [useDefaultOptions] flag indicates whether to use the default [Uri]s.
   /// - If [useDefaultOptions] is `true` (default), the default [Uri]s will be
-  /// used.
+  /// used along with any [customCheckOptions] provided.
   ///
   /// - If [useDefaultOptions] is `false`, you must provide a non-empty
   /// [customCheckOptions] list.
@@ -75,10 +75,9 @@ class InternetConnection {
     List<InternetCheckOption>? customCheckOptions,
     bool useDefaultOptions = true,
   }) : assert(
-          useDefaultOptions ||
-              (customCheckOptions != null && customCheckOptions.isNotEmpty),
+          useDefaultOptions || customCheckOptions?.isNotEmpty == true,
           'You must provide a list of options if you are not using the '
-          'default ones',
+          'default ones.',
         ) {
     _internetCheckOptions = [
       if (useDefaultOptions) ..._defaultCheckOptions,
@@ -95,7 +94,9 @@ class InternetConnection {
     InternetCheckOption(
       uri: Uri.parse('https://jsonplaceholder.typicode.com/posts/1'),
     ),
-    InternetCheckOption(uri: Uri.parse('https://pokeapi.co/api/v2/pokemon/1')),
+    InternetCheckOption(
+      uri: Uri.parse('https://pokeapi.co/api/v2/pokemon?limit=1'),
+    ),
     InternetCheckOption(uri: Uri.parse('https://reqres.in/api/users/1')),
   ];
 
@@ -127,11 +128,13 @@ class InternetConnection {
     InternetCheckOption option,
   ) async {
     try {
-      final response = await http.head(option.uri).timeout(option.timeout);
+      final response = await http
+          .head(option.uri, headers: option.headers)
+          .timeout(option.timeout);
 
       return InternetCheckResult(
         option: option,
-        isSuccess: response.statusCode == 200,
+        isSuccess: option.responseStatusFn(response),
       );
     } catch (_) {
       return InternetCheckResult(
