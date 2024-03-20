@@ -5,20 +5,20 @@ homepage: https://outdatedguy.rocks
 repository: https://github.com/OutdatedGuy/internet_connection_checker_plus/tree/main
 
 environment:
-  sdk: '>=3.0.2 <4.0.0'
-  flutter: ">=1.17.0"
+  sdk: '>=3.3.1 <4.0.0'
+  flutter: ">=3.19.3"
 
 dependencies:
   flutter:
     sdk: flutter
 
-  http: ^1.1.0
-  connectivity_plus: ^4.0.2
+  http: ^1.2.1
+  connectivity_plus: ^5.0.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.3
+  flutter_lints: ^3.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
