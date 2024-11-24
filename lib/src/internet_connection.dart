@@ -71,7 +71,7 @@ class InternetConnection {
   /// - If [useDefaultOptions] is `false`, you must provide a non-empty
   /// [customCheckOptions] list.
   InternetConnection.createInstance({
-    this.checkInterval = const Duration(seconds: 5),
+    this.checkInterval = const Duration(seconds: 10),
     List<InternetCheckOption>? customCheckOptions,
     bool useDefaultOptions = true,
   }) : assert(
@@ -90,12 +90,10 @@ class InternetConnection {
 
   /// The default list of [Uri]s used for checking internet reachability.
   final List<InternetCheckOption> _defaultCheckOptions = [
+    InternetCheckOption(uri: Uri.parse('https://one.one.one.one')),
     InternetCheckOption(uri: Uri.parse('https://icanhazip.com/')),
     InternetCheckOption(
-      uri: Uri.parse('https://jsonplaceholder.typicode.com/posts/1'),
-    ),
-    InternetCheckOption(
-      uri: Uri.parse('https://pokeapi.co/api/v2/pokemon?limit=1'),
+      uri: Uri.parse('https://jsonplaceholder.typicode.com/todos/1'),
     ),
     InternetCheckOption(uri: Uri.parse('https://reqres.in/api/users/1')),
   ];
@@ -230,7 +228,7 @@ class InternetConnection {
   void _startListeningToConnectivityChanges() {
     if (_connectivitySubscription != null) return;
     _connectivitySubscription = Connectivity().onConnectivityChanged.listen(
-      (connectivityResult) {
+      (_) {
         if (_statusController.hasListener) {
           _maybeEmitStatusUpdate();
         }

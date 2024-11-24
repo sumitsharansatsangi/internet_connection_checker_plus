@@ -61,7 +61,7 @@ Add the `internet_connection_checker_plus` package to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  internet_connection_checker_plus: ^2.2.0
+  internet_connection_checker_plus: ^2.5.2
 ```
 
 ### 2. Import the package
@@ -119,12 +119,12 @@ final connection = InternetConnection.createInstance(
 );
 ```
 
-> **Note**
+> [!IMPORTANT]
 >
 > Make sure the custom `Uri`s have no caching enabled. Otherwise, the results
 > may be inaccurate.
 
-> **Note**
+> [!IMPORTANT]
 >
 > On `web` platform, make sure the custom `Uri`s are not CORS blocked.
 > Otherwise, the results may be inaccurate.
@@ -153,31 +153,75 @@ final connection = InternetConnection.createInstance(
 );
 ```
 
+### 7. Pause and Resume on App Lifecycle Changes
+
+For situation where you want to pause any network requests when the app goes
+into the background and resume them when the app comes back into the foreground
+(see [issue #27]):
+
+```dart
+class MyWidget extends StatefulWidget {
+  const MyWidget({super.key});
+
+  @override
+  State<MyWidget> createState() => _MyWidgetState();
+}
+
+class _MyWidgetState extends State<MyWidget> {
+  late final StreamSubscription<InternetStatus> _subscription;
+  late final AppLifecycleListener _listener;
+
+  @override
+  void initState() {
+    super.initState();
+    _subscription = InternetConnection().onStatusChange.listen((status) {
+      // Handle internet status changes
+    });
+    _listener = AppLifecycleListener(
+      onResume: _subscription.resume,
+      onHide: _subscription.pause,
+      onPause: _subscription.pause,
+    );
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    _listener.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Build your widget
+  }
+}
+```
+
 #### Default `Uri`s
 
 The `InternetConnection` class uses the following `Uri`s by default:
 
 | URI                                            | Description                                                |
 | :--------------------------------------------- | :--------------------------------------------------------- |
+| `https://one.one.one.one`                      | Response time is less than `100ms`, CORS enabled, no-cache |
 | `https://icanhazip.com`                        | Response time is less than `100ms`, CORS enabled, no-cache |
-| `https://jsonplaceholder.typicode.com/posts/1` | Response time is less than `100ms`, CORS enabled, no-cache |
-| `https://pokeapi.co/api/v2/pokemon/1`          | Response time is less than `100ms`, CORS enabled, no-cache |
+| `https://jsonplaceholder.typicode.com/todos/1` | Response time is less than `100ms`, CORS enabled, no-cache |
 | `https://reqres.in/api/users/1`                | Response time is less than `100ms`, CORS enabled, no-cache |
 
 #### Some Tested URIs
 
-| URI                                                 | Description                                             |
-| :-------------------------------------------------- | :------------------------------------------------------ |
-| `https://ifconfig.me/ip`                            | Payload is less than `50` bytes, CORS enabled, no-cache |
-| `https://ipecho.net/plain`                          | Payload is less than `50` bytes, CORS enabled, no-cache |
-| `https://lenta.ru`                                  | Russia supported, CORS enabled, no-cache                |
-| `https://www.gazeta.ru`                             | Russia supported, CORS enabled, no-cache                |
-| `https://ipapi.co/ip`                               | CORS enabled, no-cache                                  |
-| `https://api.adviceslip.com/advice`                 | CORS enabled, no-cache                                  |
-| `https://api.bitbucket.org/2.0/repositories`        | CORS enabled, no-cache                                  |
-| `https://www.boredapi.com/api/activity`             | CORS enabled, no-cache                                  |
-| `https://api.thecatapi.com/v1/images/search`        | CORS enabled, no-cache                                  |
-| `https://api.coindesk.com/v1/bpi/currentprice.json` | CORS enabled, no-cache                                  |
+| URI                                                 | Description                              |
+| :-------------------------------------------------- | :--------------------------------------- |
+| `https://ipapi.co/ip`                               | CORS enabled, no-cache                   |
+| `https://api.adviceslip.com/advice`                 | CORS enabled, no-cache                   |
+| `https://api.bitbucket.org/2.0/repositories`        | CORS enabled, no-cache                   |
+| `https://api.thecatapi.com/v1/images/search`        | CORS enabled, no-cache                   |
+| `https://api.coindesk.com/v1/bpi/currentprice.json` | CORS enabled, no-cache                   |
+| `https://lenta.ru`                                  | Russia supported, CORS enabled, no-cache |
+| `https://www.gazeta.ru`                             | Russia supported, CORS enabled, no-cache |
+
+### If you liked the package, then please give it a [Like 👍🏼][package] and [Star ⭐][repository]
 
 ## Credits
 
@@ -199,7 +243,9 @@ supported by the [internet_connection_checker] package.
 
 [Flutter Networking Documentation]: https://docs.flutter.dev/data-and-backend/networking
 [package]: https://pub.dev/packages/internet_connection_checker_plus
+[repository]: https://github.com/OutdatedGuy/internet_connection_checker_plus
 [issues]: https://github.com/OutdatedGuy/internet_connection_checker_plus/issues
 [issues_closed]: https://github.com/OutdatedGuy/internet_connection_checker_plus/issues?q=is%3Aissue+is%3Aclosed
 [internet_connection_checker]: https://github.com/RounakTadvi/internet_connection_checker
 [data_connection_checker]: https://pub.dev/packages/data_connection_checker
+[issue #27]: https://github.com/OutdatedGuy/internet_connection_checker_plus/issues/27
