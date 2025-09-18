@@ -71,10 +71,12 @@ class InternetConnection {
   /// - If [useDefaultOptions] is `false`, you must provide a non-empty
   /// [customCheckOptions] list.
   InternetConnection.createInstance({
-    this.checkInterval = const Duration(seconds: 10),
+    Duration? checkInterval,
     List<InternetCheckOption>? customCheckOptions,
     bool useDefaultOptions = true,
-  }) : assert(
+    this.enableStrictCheck = false,
+  })  : _checkInterval = checkInterval ?? _defaultCheckInterval,
+        assert(
           useDefaultOptions || customCheckOptions?.isNotEmpty == true,
           'You must provide a list of options if you are not using the '
           'default ones.',
@@ -88,6 +90,9 @@ class InternetConnection {
     _statusController.onCancel = _handleStatusChangeCancel;
   }
 
+  /// The default check interval duration.
+  static const _defaultCheckInterval = Duration(seconds: 10);
+
   /// The default list of [Uri]s used for checking internet reachability.
   final List<InternetCheckOption> _defaultCheckOptions = [
     InternetCheckOption(uri: Uri.parse('https://one.one.one.one')),
@@ -95,7 +100,9 @@ class InternetConnection {
     InternetCheckOption(
       uri: Uri.parse('https://jsonplaceholder.typicode.com/todos/1'),
     ),
-    InternetCheckOption(uri: Uri.parse('https://reqres.in/api/users/1')),
+    InternetCheckOption(
+      uri: Uri.parse('https://pokeapi.co/api/v2/ability/?limit=1'),
+    ),
   ];
 
   /// The list of [Uri]s used for checking internet reachability.
@@ -109,8 +116,21 @@ class InternetConnection {
 
   /// The duration between consecutive status checks.
   ///
-  /// Defaults to 5 seconds.
-  final Duration checkInterval;
+  /// Defaults to [_defaultCheckInterval].
+  Duration _checkInterval;
+
+  /// If `true`, all checks must be successful to consider the internet as
+  /// connected.
+  ///
+  /// If `false`, only one successful check is required to consider the internet
+  /// as connected.
+  ///
+  /// Defaults to `false`.
+  ///
+  /// **Important:** Use this feature only with custom-defined Uris, not with
+  /// the default ones, to avoid potential issues with reliability or service
+  /// outages.
+  final bool enableStrictCheck;
 
   /// The last known internet connection status result.
   InternetStatus? _lastStatus;
@@ -142,6 +162,17 @@ class InternetConnection {
     }
   }
 
+  /// Updates the interval between connection checks to the given [duration] and
+  /// resets the connection checking timer.
+  void setIntervalAndResetTimer(Duration duration) {
+    _checkInterval = duration;
+    _timerHandle?.cancel();
+    _timerHandle = Timer(_checkInterval, _maybeEmitStatusUpdate);
+  }
+
+  /// Returns the current duration between connection checks.
+  Duration get checkInterval => _checkInterval;
+
   /// Checks if there is internet access by verifying connectivity to the
   /// specified [Uri]s.
   ///
@@ -149,18 +180,28 @@ class InternetConnection {
   /// whether internet access is available or not.
   Future<bool> get hasInternetAccess async {
     final completer = Completer<bool>();
-    int length = _internetCheckOptions.length;
+    int remainingChecks = _internetCheckOptions.length;
+    int successCount = 0;
 
     for (final option in _internetCheckOptions) {
       unawaited(
         _checkReachabilityFor(option).then((result) {
-          length -= 1;
+          if (result.isSuccess) {
+            successCount += 1;
+          }
+
+          remainingChecks -= 1;
 
           if (completer.isCompleted) return;
 
-          if (result.isSuccess) {
+          if (!enableStrictCheck && result.isSuccess) {
+            // Return true immediately if not in strict mode and a success is found.
             completer.complete(true);
-          } else if (length == 0) {
+          } else if (enableStrictCheck && remainingChecks == 0) {
+            // In strict mode, complete only when all checks are done.
+            completer.complete(successCount == _internetCheckOptions.length);
+          } else if (!enableStrictCheck && remainingChecks == 0) {
+            // In non-strict mode, complete as false if no success is found.
             completer.complete(false);
           }
         }),
@@ -193,7 +234,7 @@ class InternetConnection {
       _statusController.add(currentStatus);
     }
 
-    _timerHandle = Timer(checkInterval, _maybeEmitStatusUpdate);
+    _timerHandle = Timer(_checkInterval, _maybeEmitStatusUpdate);
 
     _lastStatus = currentStatus;
   }
@@ -233,6 +274,7 @@ class InternetConnection {
           _maybeEmitStatusUpdate();
         }
       },
+      onError: (_, __) {},
     );
   }
 }

@@ -23,14 +23,10 @@ network requests.
 
 ## Supported Platforms
 
-| Platform | Check Connectivity | Listen for Changes |
-| :------: | :----------------: | :----------------: |
-| Android  |         ✅         |         ✅         |
-|   iOS    |         ✅         |         ✅         |
-|  macOS   |         ✅         |         ✅         |
-|  Linux   |         ✅         |         ✅         |
-| Windows  |         ✅         |         ✅         |
-|   Web    |         ✅         |         ✅         |
+|      Features      | Android | iOS | macOS | Linux | Windows | Web |
+| :----------------: | :-----: | :-: | :---: | :---: | :-----: | :-: |
+| Check Connectivity |   ✅    | ✅  |  ✅   |  ✅   |   ✅    | ✅  |
+| Listen for Changes |   ✅    | ✅  |  ✅   |  ✅   |   ✅    | ✅  |
 
 ## Permissions
 
@@ -61,7 +57,7 @@ Add the `internet_connection_checker_plus` package to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  internet_connection_checker_plus: ^2.5.2
+  internet_connection_checker_plus: ^2.8.0
 ```
 
 ### 2. Import the package
@@ -198,7 +194,34 @@ class _MyWidgetState extends State<MyWidget> {
 }
 ```
 
-#### Default `Uri`s
+### 8. Using `enableStrictCheck`
+
+The `enableStrictCheck` option can be used to require that **all** checked URIs
+must respond successfully for the internet to be considered available. By
+default, only one successful response is required.
+
+```dart
+final connection = InternetConnection.createInstance(
+  enableStrictCheck: true,
+  customCheckOptions: [
+    InternetCheckOption(uri: Uri.parse('https://example.com')),
+    InternetCheckOption(uri: Uri.parse('https://example2.com')),
+  ],
+);
+```
+
+> [!CAUTION]
+>
+> **Use `enableStrictCheck` only with custom-defined URIs, not with the default
+> ones.**
+>
+> Using it with the default URIs may lead to unreliable results or service
+> outages, as all default endpoints must be up and reachable for a positive
+> result.
+
+## Built-in and Additional URIs
+
+### Default `Uri`s
 
 The `InternetConnection` class uses the following `Uri`s by default:
 
@@ -207,21 +230,24 @@ The `InternetConnection` class uses the following `Uri`s by default:
 | `https://one.one.one.one`                      | Response time is less than `100ms`, CORS enabled, no-cache |
 | `https://icanhazip.com`                        | Response time is less than `100ms`, CORS enabled, no-cache |
 | `https://jsonplaceholder.typicode.com/todos/1` | Response time is less than `100ms`, CORS enabled, no-cache |
-| `https://reqres.in/api/users/1`                | Response time is less than `100ms`, CORS enabled, no-cache |
+| `https://pokeapi.co/api/v2/ability/?limit=1`   | Response time is less than `100ms`, CORS enabled, no-cache |
 
-#### Some Tested URIs
+### Some Tested URIs
 
-| URI                                                 | Description                              |
-| :-------------------------------------------------- | :--------------------------------------- |
-| `https://ipapi.co/ip`                               | CORS enabled, no-cache                   |
-| `https://api.adviceslip.com/advice`                 | CORS enabled, no-cache                   |
-| `https://api.bitbucket.org/2.0/repositories`        | CORS enabled, no-cache                   |
-| `https://api.thecatapi.com/v1/images/search`        | CORS enabled, no-cache                   |
-| `https://api.coindesk.com/v1/bpi/currentprice.json` | CORS enabled, no-cache                   |
-| `https://lenta.ru`                                  | Russia supported, CORS enabled, no-cache |
-| `https://www.gazeta.ru`                             | Russia supported, CORS enabled, no-cache |
+The following `Uri`s are tested and work well with the package:
 
-### If you liked the package, then please give it a [Like 👍🏼][package] and [Star ⭐][repository]
+| URI                                          | Description                              |
+| :------------------------------------------- | :--------------------------------------- |
+| `https://ipapi.co/ip`                        | CORS enabled, no-cache                   |
+| `https://api.adviceslip.com/advice`          | CORS enabled, no-cache                   |
+| `https://api.bitbucket.org/2.0/repositories` | CORS enabled, no-cache                   |
+| `https://api.thecatapi.com/v1/images/search` | CORS enabled, no-cache                   |
+| `https://randomuser.me/api/?inc=gender`      | CORS enabled, no-cache                   |
+| `https://dog.ceo/api/breed/husky/list`       | CORS enabled, no-cache                   |
+| `https://lenta.ru`                           | Russia supported, CORS enabled, no-cache |
+| `https://www.gazeta.ru`                      | Russia supported, CORS enabled, no-cache |
+
+## If you liked the package, then please give it a [Like 👍🏼][package] and [Star ⭐][repository]
 
 ## Credits
 

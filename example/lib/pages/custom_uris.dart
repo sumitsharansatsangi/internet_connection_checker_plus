@@ -34,7 +34,10 @@ class _CustomURIsState extends State<CustomURIs> {
           uri: Uri.parse('https://api.thecatapi.com/v1/images/search'),
         ),
         InternetCheckOption(
-          uri: Uri.parse('https://api.coindesk.com/v1/bpi/currentprice.json'),
+          uri: Uri.parse('https://randomuser.me/api/?inc=gender'),
+        ),
+        InternetCheckOption(
+          uri: Uri.parse('https://dog.ceo/api/breed/husky/list'),
         ),
         InternetCheckOption(uri: Uri.parse('https://lenta.ru')),
         InternetCheckOption(uri: Uri.parse('https://www.gazeta.ru')),
@@ -56,9 +59,7 @@ class _CustomURIsState extends State<CustomURIs> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Custom URIs'),
-      ),
+      appBar: AppBar(title: const Text('Custom URIs')),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -70,17 +71,14 @@ class _CustomURIsState extends State<CustomURIs> {
                 'connection status.',
                 textAlign: TextAlign.center,
               ),
-              const Divider(
-                height: 48.0,
-                thickness: 2.0,
-              ),
+              const Divider(height: 48.0, thickness: 2.0),
               const Text('Connection Status:'),
               _connectionStatus == null
                   ? const CircularProgressIndicator.adaptive()
                   : Text(
-                      _connectionStatus.toString(),
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
+                    _connectionStatus.toString(),
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
             ],
           ),
         ),

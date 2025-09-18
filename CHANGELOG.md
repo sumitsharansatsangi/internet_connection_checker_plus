@@ -1,3 +1,28 @@
+## 2.8.0
+
+- feat: updated [connectivity_plus](https://pub.dev/packages/connectivity_plus) dependency to v7.0.0 in [d8cf04d](https://github.com/OutdatedGuy/internet_connection_checker_plus/commit/d8cf04dec0a549c06f076542bbb0c994a20b249e)
+- docs: added information about `enableStrictCheck` usage in [6fb7ed6](https://github.com/OutdatedGuy/internet_connection_checker_plus/commit/6fb7ed6a133e39af249c7324d3f5bedfe1b0cc38)
+
+## 2.7.2
+
+- fix: some URIs consistently failing in [df4461c](https://github.com/OutdatedGuy/internet_connection_checker_plus/commit/df4461ce7fa16f014fb5a998578dfd263197baeb)
+- fix: type cast error when network changes in [3d6b56e](https://github.com/OutdatedGuy/internet_connection_checker_plus/commit/3d6b56e9b80a0e471138e9b50316fcf4228da6d2)
+- docs: updated tested uris in [04f63cf](https://github.com/OutdatedGuy/internet_connection_checker_plus/commit/04f63cfa58a976fab901f81ccb56543790eaec01)
+
+## 2.7.1
+
+- Fixed Apple Privacy Manifest File Problem in [c1e65d2](https://github.com/OutdatedGuy/internet_connection_checker_plus/commit/c1e65d271bec0e42475f1786fee364ddefce8cb7). Thanks [SalihCanBinboga](https://github.com/SalihCanBinboga) for [#72](https://github.com/OutdatedGuy/internet_connection_checker_plus/pull/72)
+- chore: updated example app to flutter v3.29 in [db3c812](https://github.com/OutdatedGuy/internet_connection_checker_plus/commit/db3c81245b3db41c3074abfac2c7f9d8ecd43959)
+
+## 2.7.0
+
+- feat: flag `enableStrictCheck` to require all addresses to return success in [9edc61b](https://github.com/OutdatedGuy/internet_connection_checker_plus/commit/9edc61b2b3e6659b06328cf91efcc0218deef314)
+
+## 2.6.0
+
+- feat: function to change check interval duration and reset timer in [6a4ef67](https://github.com/OutdatedGuy/internet_connection_checker_plus/commit/6a4ef67a3810e65759a6b32b14901150785ca488). Thanks [GenixPL](https://github.com/GenixPL) for [#63](https://github.com/OutdatedGuy/internet_connection_checker_plus/pull/63)
+- chore: updated example app to flutter v3.27 in [30c8b15](https://github.com/OutdatedGuy/internet_connection_checker_plus/commit/30c8b1553bcff2bb62ad6c62abebefb15a0d5cb4)
+
 ## 2.5.2
 
 - refactor: removed unnecessary `compute` function in [33e1a55](https://github.com/OutdatedGuy/internet_connection_checker_plus/commit/33e1a55743ac6924d31300913991ecc3b3ba85a3)
@@ -6,7 +31,7 @@
 
 ## 2.5.1
 
-- refactor: lowered sdk constraints to support dart 2.15 and above
+- refactor: lowered sdk constraints to support dart 2.15 and above in [c78ef26](https://github.com/OutdatedGuy/internet_connection_checker_plus/commit/c78ef2638bc9d18f284c0d307377a4b30102b253)
 
 ## 2.5.0
 
