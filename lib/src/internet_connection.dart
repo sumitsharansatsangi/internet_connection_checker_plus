@@ -271,6 +271,6 @@ class InternetConnection {
       if (_statusController.hasListener) {
         _maybeEmitStatusUpdate();
       }
-    }, onError: (_, __) {});
+    }, onError: (_, _) {});
   }
 }
