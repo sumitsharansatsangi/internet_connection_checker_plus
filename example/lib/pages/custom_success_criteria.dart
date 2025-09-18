@@ -21,21 +21,22 @@ class _CustomSuccessCriteriaState extends State<CustomSuccessCriteria> {
   @override
   void initState() {
     super.initState();
-    _subscription = InternetConnection.createInstance(
-      customCheckOptions: [
-        InternetCheckOption(
-          uri: Uri.parse('https://img.shields.io/pub/'),
-          responseStatusFn: (response) {
-            return response.statusCode == 404;
-          },
-        ),
-      ],
-      useDefaultOptions: false,
-    ).onStatusChange.listen((status) {
-      setState(() {
-        _connectionStatus = status;
-      });
-    });
+    _subscription =
+        InternetConnection.createInstance(
+          customCheckOptions: [
+            InternetCheckOption(
+              uri: Uri.parse('https://img.shields.io/pub/'),
+              responseStatusFn: (response) {
+                return response.statusCode == 404;
+              },
+            ),
+          ],
+          useDefaultOptions: false,
+        ).onStatusChange.listen((status) {
+          setState(() {
+            _connectionStatus = status;
+          });
+        });
   }
 
   @override
@@ -66,9 +67,9 @@ class _CustomSuccessCriteriaState extends State<CustomSuccessCriteria> {
               _connectionStatus == null
                   ? const CircularProgressIndicator.adaptive()
                   : Text(
-                    _connectionStatus.toString(),
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
+                      _connectionStatus.toString(),
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
             ],
           ),
         ),

@@ -57,7 +57,7 @@
 /// ```dart
 /// listener.cancel();
 /// ```
-library internet_connection_checker_plus;
+library;
 
 // Dart Packages
 import 'dart:async';

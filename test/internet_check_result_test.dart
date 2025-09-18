@@ -16,7 +16,8 @@ void main() {
         isSuccess: true,
       );
 
-      String expectedString = 'InternetCheckResult(\n'
+      String expectedString =
+          'InternetCheckResult(\n'
           '  option: InternetCheckOption(\n'
           '    uri: https://example.com,\n'
           '    timeout: 0:00:03.000000,\n'

@@ -21,33 +21,34 @@ class _CustomURIsState extends State<CustomURIs> {
   @override
   void initState() {
     super.initState();
-    _subscription = InternetConnection.createInstance(
-      customCheckOptions: [
-        InternetCheckOption(uri: Uri.parse('https://ipapi.co/ip')),
-        InternetCheckOption(
-          uri: Uri.parse('https://api.adviceslip.com/advice'),
-        ),
-        InternetCheckOption(
-          uri: Uri.parse('https://api.bitbucket.org/2.0/repositories'),
-        ),
-        InternetCheckOption(
-          uri: Uri.parse('https://api.thecatapi.com/v1/images/search'),
-        ),
-        InternetCheckOption(
-          uri: Uri.parse('https://randomuser.me/api/?inc=gender'),
-        ),
-        InternetCheckOption(
-          uri: Uri.parse('https://dog.ceo/api/breed/husky/list'),
-        ),
-        InternetCheckOption(uri: Uri.parse('https://lenta.ru')),
-        InternetCheckOption(uri: Uri.parse('https://www.gazeta.ru')),
-      ],
-      useDefaultOptions: false,
-    ).onStatusChange.listen((status) {
-      setState(() {
-        _connectionStatus = status;
-      });
-    });
+    _subscription =
+        InternetConnection.createInstance(
+          customCheckOptions: [
+            InternetCheckOption(uri: Uri.parse('https://ipapi.co/ip')),
+            InternetCheckOption(
+              uri: Uri.parse('https://api.adviceslip.com/advice'),
+            ),
+            InternetCheckOption(
+              uri: Uri.parse('https://api.bitbucket.org/2.0/repositories'),
+            ),
+            InternetCheckOption(
+              uri: Uri.parse('https://api.thecatapi.com/v1/images/search'),
+            ),
+            InternetCheckOption(
+              uri: Uri.parse('https://randomuser.me/api/?inc=gender'),
+            ),
+            InternetCheckOption(
+              uri: Uri.parse('https://dog.ceo/api/breed/husky/list'),
+            ),
+            InternetCheckOption(uri: Uri.parse('https://lenta.ru')),
+            InternetCheckOption(uri: Uri.parse('https://www.gazeta.ru')),
+          ],
+          useDefaultOptions: false,
+        ).onStatusChange.listen((status) {
+          setState(() {
+            _connectionStatus = status;
+          });
+        });
   }
 
   @override
@@ -76,9 +77,9 @@ class _CustomURIsState extends State<CustomURIs> {
               _connectionStatus == null
                   ? const CircularProgressIndicator.adaptive()
                   : Text(
-                    _connectionStatus.toString(),
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
+                      _connectionStatus.toString(),
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
             ],
           ),
         ),

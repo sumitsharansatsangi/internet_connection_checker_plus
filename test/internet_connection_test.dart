@@ -111,9 +111,7 @@ void main() {
             checkInterval: const Duration(milliseconds: 100),
             useDefaultOptions: false,
             customCheckOptions: [
-              InternetCheckOption(
-                uri: Uri.parse('https://www.example.com'),
-              ),
+              InternetCheckOption(uri: Uri.parse('https://www.example.com')),
             ],
           ).onStatusChange.listen((_) {});
 
@@ -139,9 +137,7 @@ void main() {
             checkInterval: const Duration(milliseconds: 100),
             useDefaultOptions: false,
             customCheckOptions: [
-              InternetCheckOption(
-                uri: Uri.parse('https://www.example.com'),
-              ),
+              InternetCheckOption(uri: Uri.parse('https://www.example.com')),
             ],
           );
 
@@ -175,9 +171,7 @@ void main() {
             checkInterval: const Duration(milliseconds: 100),
             useDefaultOptions: false,
             customCheckOptions: [
-              InternetCheckOption(
-                uri: Uri.parse('https://www.example.com'),
-              ),
+              InternetCheckOption(uri: Uri.parse('https://www.example.com')),
             ],
           );
 

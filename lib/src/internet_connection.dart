@@ -75,12 +75,12 @@ class InternetConnection {
     List<InternetCheckOption>? customCheckOptions,
     bool useDefaultOptions = true,
     this.enableStrictCheck = false,
-  })  : _checkInterval = checkInterval ?? _defaultCheckInterval,
-        assert(
-          useDefaultOptions || customCheckOptions?.isNotEmpty == true,
-          'You must provide a list of options if you are not using the '
-          'default ones.',
-        ) {
+  }) : _checkInterval = checkInterval ?? _defaultCheckInterval,
+       assert(
+         useDefaultOptions || customCheckOptions?.isNotEmpty == true,
+         'You must provide a list of options if you are not using the '
+         'default ones.',
+       ) {
     _internetCheckOptions = [
       if (useDefaultOptions) ..._defaultCheckOptions,
       if (customCheckOptions != null) ...customCheckOptions,
@@ -155,10 +155,7 @@ class InternetConnection {
         isSuccess: option.responseStatusFn(response),
       );
     } catch (_) {
-      return InternetCheckResult(
-        option: option,
-        isSuccess: false,
-      );
+      return InternetCheckResult(option: option, isSuccess: false);
     }
   }
 
@@ -268,13 +265,12 @@ class InternetConnection {
   /// [connectivity_plus]: https://pub.dev/packages/connectivity_plus
   void _startListeningToConnectivityChanges() {
     if (_connectivitySubscription != null) return;
-    _connectivitySubscription = Connectivity().onConnectivityChanged.listen(
-      (_) {
-        if (_statusController.hasListener) {
-          _maybeEmitStatusUpdate();
-        }
-      },
-      onError: (_, __) {},
-    );
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((
+      _,
+    ) {
+      if (_statusController.hasListener) {
+        _maybeEmitStatusUpdate();
+      }
+    }, onError: (_, __) {});
   }
 }

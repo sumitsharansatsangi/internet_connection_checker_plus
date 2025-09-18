@@ -1,9 +1,8 @@
 // Third Party Packages
 import 'package:http/http.dart' as http;
 
-typedef TestHttpResponseBuilder = http.Response Function(
-  http.BaseRequest request,
-);
+typedef TestHttpResponseBuilder =
+    http.Response Function(http.BaseRequest request);
 
 class TestHttpClient extends http.BaseClient {
   TestHttpResponseBuilder? responseBuilder;
@@ -12,10 +11,7 @@ class TestHttpClient extends http.BaseClient {
     Future<void> Function(TestHttpClient client) fn,
   ) async {
     final client = TestHttpClient();
-    await http.runWithClient(
-      () => fn(client),
-      () => client,
-    );
+    await http.runWithClient(() => fn(client), () => client);
   }
 
   static http.Response createResponse({String? body, int statusCode = 200}) {
@@ -24,8 +20,9 @@ class TestHttpClient extends http.BaseClient {
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    final response =
-        (responseBuilder ?? (req) => http.Response('', 200))(request);
+    final response = (responseBuilder ?? (req) => http.Response('', 200))(
+      request,
+    );
     return http.StreamedResponse(
       Stream.value(response.bodyBytes),
       response.statusCode,

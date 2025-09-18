@@ -12,7 +12,8 @@ void main() {
         timeout: const Duration(seconds: 5),
       );
 
-      const expectedString = 'InternetCheckOption(\n'
+      const expectedString =
+          'InternetCheckOption(\n'
           '  uri: https://example.com,\n'
           '  timeout: 0:00:05.000000,\n'
           '  headers: {}\n'
