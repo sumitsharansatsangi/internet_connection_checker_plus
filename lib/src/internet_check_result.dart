@@ -11,7 +11,10 @@ class InternetCheckResult {
   ///
   /// This class encapsulates the outcome of an internet connection check
   /// performed with a specific [InternetCheckOption].
-  InternetCheckResult({required this.option, required this.isSuccess});
+  const InternetCheckResult({
+    required this.option,
+    required this.isSuccess,
+  });
 
   /// The option used to check internet connection for this result.
   final InternetCheckOption option;

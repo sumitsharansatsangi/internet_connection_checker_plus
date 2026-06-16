@@ -1,10 +1,7 @@
-// Dart Packages
 import 'dart:async';
 
-// Flutter Packages
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-
-// This Package
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class ListenToStream extends StatefulWidget {
@@ -16,12 +13,16 @@ class ListenToStream extends StatefulWidget {
 
 class _ListenToStreamState extends State<ListenToStream> {
   InternetStatus? _connectionStatus;
+  late InternetConnection _internetConnection;
   late StreamSubscription<InternetStatus> _subscription;
 
   @override
   void initState() {
     super.initState();
-    _subscription = InternetConnection().onStatusChange.listen((status) {
+    _internetConnection = InternetConnection.createInstance(
+      triggerStream: Connectivity().onConnectivityChanged,
+    );
+    _subscription = _internetConnection.onStatusChange.listen((status) {
       setState(() {
         _connectionStatus = status;
       });
@@ -31,6 +32,7 @@ class _ListenToStreamState extends State<ListenToStream> {
   @override
   void dispose() {
     _subscription.cancel();
+    _internetConnection.dispose();
     super.dispose();
   }
 

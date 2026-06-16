@@ -1,10 +1,6 @@
-// Dart Packages
 import 'dart:async';
 
-// Flutter Packages
 import 'package:flutter/material.dart';
-
-// This Package
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class CustomSuccessCriteria extends StatefulWidget {
@@ -16,32 +12,34 @@ class CustomSuccessCriteria extends StatefulWidget {
 
 class _CustomSuccessCriteriaState extends State<CustomSuccessCriteria> {
   InternetStatus? _connectionStatus;
+  late InternetConnection _internetConnection;
   late StreamSubscription<InternetStatus> _subscription;
 
   @override
   void initState() {
     super.initState();
-    _subscription =
-        InternetConnection.createInstance(
-          customCheckOptions: [
-            InternetCheckOption(
-              uri: Uri.parse('https://img.shields.io/pub/'),
-              responseStatusFn: (response) {
-                return response.statusCode == 404;
-              },
-            ),
-          ],
-          useDefaultOptions: false,
-        ).onStatusChange.listen((status) {
-          setState(() {
-            _connectionStatus = status;
-          });
-        });
+    _internetConnection = InternetConnection.createInstance(
+      customCheckOptions: [
+        InternetCheckOption(
+          uri: Uri.parse('https://img.shields.io/pub/'),
+          responseStatusFn: (response) {
+            return response.statusCode == 404;
+          },
+        ),
+      ],
+      useDefaultOptions: false,
+    );
+    _subscription = _internetConnection.onStatusChange.listen((status) {
+      setState(() {
+        _connectionStatus = status;
+      });
+    });
   }
 
   @override
   void dispose() {
     _subscription.cancel();
+    _internetConnection.dispose();
     super.dispose();
   }
 

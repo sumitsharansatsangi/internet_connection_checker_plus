@@ -1,208 +1,194 @@
+<div align="center">
+  <h3>🧠 Created by the developer of Brink: Psychological Warfare</h3>
+  <p>
+    <em>"Can you find the sweet spot between bold and delusional?"</em><br />
+    Support the maintenance of this package by checking out my latest indie
+    game!
+  </p>
+
+  <p>
+    <a
+      href="https://play.google.com/store/apps/details?id=rocks.outdatedguy.brink"
+      target="_blank"
+    >
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+        width="200"
+        alt="Get it on Google Play"
+      />
+    </a>
+    &nbsp;
+    <a href="https://apps.apple.com/app/id6753995293" target="_blank">
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg"
+        width="200"
+        alt="Download on the App Store"
+      />
+    </a>
+  </p>
+</div>
+
+---
+
 # Internet Connection Checker Plus
 
-A Flutter package to check your internet connection with subsecond response
-times, even on mobile networks!
+[![pub package][package_svg]][package] [![GitHub][license_svg]](LICENSE)
 
-[![pub package][package_svg]][package]
-[![GitHub][license_svg]](LICENSE)
+An enterprise-grade network connectivity monitor for Dart and Flutter.
 
-[![GitHub issues][issues_svg]][issues]
-[![GitHub issues closed][issues_closed_svg]][issues_closed]
+Standard network interfaces can verify local connections (like Wi-Fi router
+connectivity) but cannot guarantee actual internet reachability. This package
+proactively verifies external routing by checking reachability and response
+statuses against highly available global endpoints.
 
-<hr />
-
-This library provides functionality to monitor and verify internet connectivity
-by checking reachability to various `Uri`s. It relies on the `connectivity_plus`
-package for listening to connectivity changes and the `http` package for making
-network requests.
+> [!NOTE]
+>
+> **🚀 v3 is now available!** It removes the `connectivity_plus` dependency to
+> make this a pure Dart package. Please read the
+> [v3 Migration Guide](MIGRATION_V3.md) to understand the breaking changes and
+> how to update your project.
 
 ## Features
 
-- Check internet connectivity status
-- Listen for internet connectivity changes
+- **Accurate Verification:** Verifies real internet access instead of local
+  network status.
+- **High Performance:** Designed for subsecond response times.
+- **Real-Time Monitoring:** Stream-based API for immediate connectivity status
+  updates.
+- **Extensible Architecture:** Define custom endpoints, validation criteria, and
+  networking clients.
+- **Universal Compatibility:** Natively supports both pure Dart environments and
+  Flutter applications.
 
-## Supported Platforms
+## Permissions (Flutter)
 
-|      Features      | Android | iOS | macOS | Linux | Windows | Web |
-| :----------------: | :-----: | :-: | :---: | :---: | :-----: | :-: |
-| Check Connectivity |   ✅    | ✅  |  ✅   |  ✅   |   ✅    | ✅  |
-| Listen for Changes |   ✅    | ✅  |  ✅   |  ✅   |   ✅    | ✅  |
+When using this package in a Flutter application, ensure you have the
+appropriate network permissions enabled for your target platforms.
 
-## Permissions
-
-### Android
-
-Add the following permissions to your `AndroidManifest.xml` file:
-
-```xml
-<uses-permission android:name="android.permission.INTERNET" />
-```
-
-### macOS
-
-Add the following permissions to your macOS `.entitlements` files:
-
-```entitlements
-<key>com.apple.security.network.client</key>
-<true/>
-```
-
-For more information, see the [Flutter Networking Documentation].
+For detailed platform-specific network permission instructions, please refer to
+the [Flutter Networking Documentation].
 
 ## Usage
 
-### 1. Add dependency
+### Basic Verification
 
-Add the `internet_connection_checker_plus` package to your `pubspec.yaml` file:
-
-```yaml
-dependencies:
-  internet_connection_checker_plus: ^2.8.0
-```
-
-### 2. Import the package
-
-Import the `internet_connection_checker_plus` package into your Dart file:
+Check for connectivity on demand:
 
 ```dart
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+final bool isConnected = await InternetConnection().hasInternetAccess;
 ```
 
-### 3. Checking for internet connectivity
+### Real-Time Monitoring
 
-The simplest way to check for internet connectivity is to use the
-`InternetConnection` class:
-
-```dart
-bool result = await InternetConnection().hasInternetAccess;
-```
-
-### 4. Listening for internet connectivity changes
-
-The `InternetConnection` class also provides a stream of `InternetStatus` that
-can be used to listen for changes in internet connectivity:
+Listen to continuous connectivity updates:
 
 ```dart
-final listener = InternetConnection().onStatusChange.listen((InternetStatus status) {
-  switch (status) {
-    case InternetStatus.connected:
-      // The internet is now connected
-      break;
-    case InternetStatus.disconnected:
-      // The internet is now disconnected
-      break;
-  }
-});
-```
-
-Don't forget to cancel the subscription when it is no longer needed.
-This will prevent memory leaks and free up resources:
-
-```dart
-listener.cancel();
-```
-
-### 5. Add custom `Uri`s to check
-
-The `InternetConnection` class can be configured to check custom `Uri`s for
-internet connectivity:
-
-```dart
-final connection = InternetConnection.createInstance(
-  customCheckOptions: [
-    InternetCheckOption(uri: Uri.parse('https://example.com')),
-  ],
+final subscription = InternetConnection().onStatusChange.listen(
+  (InternetStatus status) {
+    if (status == InternetStatus.connected) {
+      // Connection established
+    } else {
+      // Connection lost
+    }
+  },
 );
+
+// Cancel the subscription when it is no longer needed to prevent memory leaks
+subscription.cancel();
 ```
 
-> [!IMPORTANT]
->
-> Make sure the custom `Uri`s have no caching enabled. Otherwise, the results
-> may be inaccurate.
+## 💝 Support the Project
+
+If this package saved you from the eternal torment of "No Internet Connection"
+errors, consider buying me a coffee! ☕
+
+<a href="https://coff.ee/outdatedguy" target="_blank">
+  <img
+    src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+    alt="Buy Me A Coffee"
+    height="102"
+    width="363"
+  />
+</a>
+
+## Advanced Configuration
+
+### Custom Endpoints and Validation
+
+Override the default validation endpoints and acceptable HTTP status codes.
 
 > [!IMPORTANT]
 >
-> On `web` platform, make sure the custom `Uri`s are not CORS blocked.
-> Otherwise, the results may be inaccurate.
-
-### 6. Add custom success criteria
-
-The `InternetConnection` class can be configured to check custom `Uri`s for
-internet connectivity using custom success criteria:
+> Ensure your custom endpoints have no caching and aren't CORS blocked if you
+> intend to use them on the Web platform.
 
 ```dart
 final connection = InternetConnection.createInstance(
   customCheckOptions: [
     InternetCheckOption(
-      uri: Uri.parse('https://example.com'),
-      responseStatusFn: (response) {
-        return response.statusCode >= 69 && response.statusCode < 169;
-      },
-    ),
-    InternetCheckOption(
-      uri: Uri.parse('https://example2.com'),
-      responseStatusFn: (response) {
-        return response.statusCode >= 420 && response.statusCode < 1412;
-      },
+      uri: Uri.parse('https://cloudflare.com/cdn-cgi/trace'),
+      responseStatusFn: (response) => response.statusCode == 69,
     ),
   ],
 );
 ```
 
-### 7. Pause and Resume on App Lifecycle Changes
+### Memory Management
 
-For situation where you want to pause any network requests when the app goes
-into the background and resume them when the app comes back into the foreground
-(see [issue #27]):
+If you create custom instances of `InternetConnection` using `createInstance()`, you should proactively free up resources when the instance is no longer needed to prevent memory leaks (e.g., lingering timers and unclosed stream controllers).
 
 ```dart
-class MyWidget extends StatefulWidget {
-  const MyWidget({super.key});
+final customConnection = InternetConnection.createInstance();
 
-  @override
-  State<MyWidget> createState() => _MyWidgetState();
-}
-
-class _MyWidgetState extends State<MyWidget> {
-  late final StreamSubscription<InternetStatus> _subscription;
-  late final AppLifecycleListener _listener;
-
-  @override
-  void initState() {
-    super.initState();
-    _subscription = InternetConnection().onStatusChange.listen((status) {
-      // Handle internet status changes
-    });
-    _listener = AppLifecycleListener(
-      onResume: _subscription.resume,
-      onHide: _subscription.pause,
-      onPause: _subscription.pause,
-    );
-  }
-
-  @override
-  void dispose() {
-    _subscription.cancel();
-    _listener.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Build your widget
-  }
-}
+// When done with the instance:
+await customConnection.dispose();
 ```
 
-### 8. Using `enableStrictCheck`
+> [!WARNING]
+>
+> **Never call `dispose()` on the global singleton (`InternetConnection()`).**
+>
+> The singleton is designed to live throughout the entire lifecycle of your application. Disposing of it will permanently close its internal streams and break any other parts of your app that rely on it.
 
-The `enableStrictCheck` option can be used to require that **all** checked URIs
-must respond successfully for the internet to be considered available. By
-default, only one successful response is required.
+### Custom HTTP Client Implementation
+
+Integrate existing networking clients (like `dio`) to maintain consistent
+configurations across your application.
+
+```dart
+final connection = InternetConnection.createInstance(
+  customConnectivityCheck: (option) async {
+    try {
+      final dio = Dio();
+      final response = await dio.head(
+        option.uri.toString(),
+        options: Options(
+          headers: option.headers,
+          receiveTimeout: option.timeout,
+          validateStatus: (_) => true,
+        ),
+      );
+
+      return InternetCheckResult(
+        option: option,
+        isSuccess: response.statusCode == 42,
+      );
+    } catch (_) {
+      return InternetCheckResult(option: option, isSuccess: false);
+    }
+  },
+);
+```
+
+### Strict Mode Validation
+
+By default, the package confirms connectivity if _any_ endpoint resolves
+successfully. Enabling strict mode requires _all_ provided endpoints to succeed.
 
 ```dart
 final connection = InternetConnection.createInstance(
   enableStrictCheck: true,
+  useDefaultOptions: false,
   customCheckOptions: [
     InternetCheckOption(uri: Uri.parse('https://example.com')),
     InternetCheckOption(uri: Uri.parse('https://example2.com')),
@@ -219,59 +205,89 @@ final connection = InternetConnection.createInstance(
 > outages, as all default endpoints must be up and reachable for a positive
 > result.
 
-## Built-in and Additional URIs
+### Pause and Resume on App Lifecycle Changes (Flutter)
 
-### Default `Uri`s
+For situations where you want to pause any network requests when the app goes
+into the background and resume them when the app comes back into the foreground,
+use `AppLifecycleListener`.
 
-The `InternetConnection` class uses the following `Uri`s by default:
+Because this package uses a broadcast stream, which buffers events, you should
+cancel the subscription when paused and create a new one when resuming to avoid
+receiving stale events (see [issue #105]):
 
-| URI                                            | Description                                                |
-| :--------------------------------------------- | :--------------------------------------------------------- |
-| `https://one.one.one.one`                      | Response time is less than `100ms`, CORS enabled, no-cache |
-| `https://icanhazip.com`                        | Response time is less than `100ms`, CORS enabled, no-cache |
-| `https://jsonplaceholder.typicode.com/todos/1` | Response time is less than `100ms`, CORS enabled, no-cache |
-| `https://pokeapi.co/api/v2/ability/?limit=1`   | Response time is less than `100ms`, CORS enabled, no-cache |
+```dart
+class _MyWidgetState extends State<MyWidget> {
+  late StreamSubscription<InternetStatus> _subscription;
+  late final AppLifecycleListener _listener;
 
-### Some Tested URIs
+  @override
+  void initState() {
+    super.initState();
+    _startListening();
 
-The following `Uri`s are tested and work well with the package:
+    _listener = AppLifecycleListener(
+      onResume: _startListening,
+      onPause: () => _subscription.cancel(),
+    );
+  }
 
-| URI                                          | Description                              |
-| :------------------------------------------- | :--------------------------------------- |
-| `https://ipapi.co/ip`                        | CORS enabled, no-cache                   |
-| `https://api.adviceslip.com/advice`          | CORS enabled, no-cache                   |
-| `https://api.bitbucket.org/2.0/repositories` | CORS enabled, no-cache                   |
-| `https://api.thecatapi.com/v1/images/search` | CORS enabled, no-cache                   |
-| `https://randomuser.me/api/?inc=gender`      | CORS enabled, no-cache                   |
-| `https://dog.ceo/api/breed/husky/list`       | CORS enabled, no-cache                   |
-| `https://lenta.ru`                           | Russia supported, CORS enabled, no-cache |
-| `https://www.gazeta.ru`                      | Russia supported, CORS enabled, no-cache |
+  void _startListening() {
+    _subscription = InternetConnection().onStatusChange.listen((status) {
+      // Handle internet status changes
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    _listener.dispose();
+    super.dispose();
+  }
+}
+```
+
+## For Third-Party Package Developers
+
+If you are building a package, plugin, or library that depends on `internet_connection_checker_plus`, **do not use the singleton instance** (`InternetConnection()`).
+
+If your package alters the singleton's configuration or accidentally calls `dispose()` on it, you will introduce side effects that break the host application using your package. Instead, always instantiate a dedicated checker using `createInstance()` and manage its lifecycle entirely within your package.
+
+```dart
+class MyCustomPackageService {
+  final InternetConnection _connectionChecker;
+
+  // Use createInstance() to isolate your connection checker from the host app
+  MyCustomPackageService() : _connectionChecker = InternetConnection.createInstance();
+
+  // Safely clean up only your isolated instance
+  Future<void> shutdown() async {
+    await _connectionChecker.dispose();
+  }
+}
+```
+
+## Default Endpoints
+
+The following endpoints are checked by default _(carefully selected for speed
+and reliability!)_:
+
+| URI                                                              | Description                                     |
+| :--------------------------------------------------------------- | :---------------------------------------------- |
+| https://one.one.one.one                                          | Response time < `100ms`, CORS enabled, no-cache |
+| https://icanhazip.com                                            | Response time < `100ms`, CORS enabled, no-cache |
+| https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js | Response time < `100ms`, CORS enabled, no-cache |
+| https://captive.apple.com/internet-check                         | Response time < `100ms`, CORS enabled, no-cache |
 
 ## If you liked the package, then please give it a [Like 👍🏼][package] and [Star ⭐][repository]
-
-## Credits
-
-This package is a cloned and modified version of the
-[internet_connection_checker] package which is a cloned and modified version of
-the [data_connection_checker] package which is no longer maintained.
-
-The aim of this package is to support the `web` platform which is currently not
-supported by the [internet_connection_checker] package.
 
 <!-- Badges URLs -->
 
 [package_svg]: https://img.shields.io/pub/v/internet_connection_checker_plus.svg?color=blueviolet
 [license_svg]: https://img.shields.io/github/license/OutdatedGuy/internet_connection_checker_plus.svg?color=purple
-[issues_svg]: https://img.shields.io/github/issues/OutdatedGuy/internet_connection_checker_plus.svg
-[issues_closed_svg]: https://img.shields.io/github/issues-closed/OutdatedGuy/internet_connection_checker_plus.svg?color=green
 
 <!-- Links -->
 
 [Flutter Networking Documentation]: https://docs.flutter.dev/data-and-backend/networking
 [package]: https://pub.dev/packages/internet_connection_checker_plus
 [repository]: https://github.com/OutdatedGuy/internet_connection_checker_plus
-[issues]: https://github.com/OutdatedGuy/internet_connection_checker_plus/issues
-[issues_closed]: https://github.com/OutdatedGuy/internet_connection_checker_plus/issues?q=is%3Aissue+is%3Aclosed
-[internet_connection_checker]: https://github.com/RounakTadvi/internet_connection_checker
-[data_connection_checker]: https://pub.dev/packages/data_connection_checker
-[issue #27]: https://github.com/OutdatedGuy/internet_connection_checker_plus/issues/27
+[issue #105]: https://github.com/OutdatedGuy/internet_connection_checker_plus/issues/105

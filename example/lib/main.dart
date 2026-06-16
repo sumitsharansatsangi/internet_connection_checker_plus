@@ -1,7 +1,5 @@
-// Flutter Packages
 import 'package:flutter/material.dart';
 
-// Pages
 import 'pages/custom_success_criteria.dart';
 import 'pages/custom_uris.dart';
 import 'pages/listen_once.dart';
@@ -20,6 +18,14 @@ class MyApp extends StatelessWidget {
       title: 'Internet Connection Checker Plus Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          brightness: Brightness.dark,
+          seedColor: Colors.deepPurple,
+        ),
         useMaterial3: true,
       ),
       home: MyHomePage(),
@@ -52,9 +58,9 @@ class MyHomePage extends StatelessWidget {
               padding: const EdgeInsets.all(10.0),
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.of(
-                    context,
-                  ).push(MaterialPageRoute(builder: (context) => entry.value));
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => entry.value),
+                  );
                 },
                 child: Text(entry.key),
               ),

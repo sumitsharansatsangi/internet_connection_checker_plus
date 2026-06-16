@@ -1,10 +1,6 @@
-// Dart Packages
 import 'dart:async';
 
-// Flutter Packages
 import 'package:flutter/material.dart';
-
-// This Package
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class CustomURIs extends StatefulWidget {
@@ -16,44 +12,48 @@ class CustomURIs extends StatefulWidget {
 
 class _CustomURIsState extends State<CustomURIs> {
   InternetStatus? _connectionStatus;
+  late InternetConnection _internetConnection;
   late StreamSubscription<InternetStatus> _subscription;
 
   @override
   void initState() {
     super.initState();
-    _subscription =
-        InternetConnection.createInstance(
-          customCheckOptions: [
-            InternetCheckOption(uri: Uri.parse('https://ipapi.co/ip')),
-            InternetCheckOption(
-              uri: Uri.parse('https://api.adviceslip.com/advice'),
-            ),
-            InternetCheckOption(
-              uri: Uri.parse('https://api.bitbucket.org/2.0/repositories'),
-            ),
-            InternetCheckOption(
-              uri: Uri.parse('https://api.thecatapi.com/v1/images/search'),
-            ),
-            InternetCheckOption(
-              uri: Uri.parse('https://randomuser.me/api/?inc=gender'),
-            ),
-            InternetCheckOption(
-              uri: Uri.parse('https://dog.ceo/api/breed/husky/list'),
-            ),
-            InternetCheckOption(uri: Uri.parse('https://lenta.ru')),
-            InternetCheckOption(uri: Uri.parse('https://www.gazeta.ru')),
-          ],
-          useDefaultOptions: false,
-        ).onStatusChange.listen((status) {
-          setState(() {
-            _connectionStatus = status;
-          });
-        });
+    _internetConnection = InternetConnection.createInstance(
+      customCheckOptions: [
+        InternetCheckOption(
+          uri: Uri.parse('https://cloudflare.com/cdn-cgi/trace'),
+        ),
+        InternetCheckOption(uri: Uri.parse('https://ipapi.co/ip')),
+        InternetCheckOption(
+          uri: Uri.parse('https://api.adviceslip.com/advice'),
+        ),
+        InternetCheckOption(
+          uri: Uri.parse('https://api.bitbucket.org/2.0/repositories'),
+        ),
+        InternetCheckOption(
+          uri: Uri.parse('https://api.thecatapi.com/v1/images/search'),
+        ),
+        InternetCheckOption(
+          uri: Uri.parse('https://randomuser.me/api/?inc=gender'),
+        ),
+        InternetCheckOption(
+          uri: Uri.parse('https://dog.ceo/api/breed/husky/list'),
+        ),
+        InternetCheckOption(uri: Uri.parse('https://lenta.ru')),
+      ],
+      useDefaultOptions: false,
+    );
+    _subscription = _internetConnection.onStatusChange.listen((status) {
+      setState(() {
+        _connectionStatus = status;
+      });
+    });
   }
 
   @override
   void dispose() {
     _subscription.cancel();
+    _internetConnection.dispose();
     super.dispose();
   }
 

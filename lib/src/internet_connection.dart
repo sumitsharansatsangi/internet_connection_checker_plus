@@ -1,13 +1,23 @@
 part of '../internet_connection_checker_plus.dart';
 
+/// A callback function for checking if a specific internet endpoint is
+/// reachable.
+///
+/// Takes a single [InternetCheckOption] and returns a
+/// [Future] that completes with an [InternetCheckResult].
+///
+/// This allows for complete customization of how connectivity is checked for
+/// each endpoint.
+typedef ConnectivityCheckCallback = Future<InternetCheckResult> Function(
+  InternetCheckOption option,
+);
+
 /// A utility class for checking internet connectivity status.
 ///
 /// This class provides functionality to monitor and verify internet
 /// connectivity by checking reachability to various [Uri]s. It relies on the
-/// [connectivity_plus] package for listening to connectivity changes and the
 /// [http][http_link] package for making network requests.
 ///
-/// [connectivity_plus]: https://pub.dev/packages/connectivity_plus
 /// [http_link]: https://pub.dev/packages/http
 ///
 /// <br />
@@ -52,9 +62,7 @@ part of '../internet_connection_checker_plus.dart';
 /// listener.cancel();
 /// ```
 class InternetConnection {
-  /// Returns an instance of [InternetConnection].
-  ///
-  /// This is a singleton class, meaning that there is only one instance of it.
+  /// Returns the singleton instance of [InternetConnection].
   factory InternetConnection() => _instance;
 
   /// Creates an instance of [InternetConnection].
@@ -70,23 +78,36 @@ class InternetConnection {
   ///
   /// - If [useDefaultOptions] is `false`, you must provide a non-empty
   /// [customCheckOptions] list.
+  ///
+  /// The [customConnectivityCheck] allows you to provide a custom method for
+  /// checking endpoint reachability. If provided, it will be used for all
+  /// connectivity checks instead of the default HTTP HEAD request
+  /// implementation.
+  ///
+  /// Make sure to call [dispose] when this instance is no longer needed to free
+  /// up resources.
   InternetConnection.createInstance({
     Duration? checkInterval,
     List<InternetCheckOption>? customCheckOptions,
     bool useDefaultOptions = true,
     this.enableStrictCheck = false,
-  }) : _checkInterval = checkInterval ?? _defaultCheckInterval,
-       assert(
-         useDefaultOptions || customCheckOptions?.isNotEmpty == true,
-         'You must provide a list of options if you are not using the '
-         'default ones.',
-       ) {
-    _internetCheckOptions = [
+    this.customConnectivityCheck,
+    this.triggerStream,
+  })  : _checkInterval = checkInterval ?? _defaultCheckInterval,
+        assert(
+          useDefaultOptions || customCheckOptions?.isNotEmpty == true,
+          'You must provide a list of options if you are not using the '
+          'default ones.',
+        ) {
+    _internetCheckOptions = List.unmodifiable([
       if (useDefaultOptions) ..._defaultCheckOptions,
-      if (customCheckOptions != null) ...customCheckOptions,
-    ];
+      ...?customCheckOptions,
+    ]);
 
-    _statusController.onListen = _maybeEmitStatusUpdate;
+    _statusController.onListen = () {
+      _startListeningToTriggerEvents();
+      _maybeEmitStatusUpdate();
+    };
     _statusController.onCancel = _handleStatusChangeCancel;
   }
 
@@ -94,19 +115,21 @@ class InternetConnection {
   static const _defaultCheckInterval = Duration(seconds: 10);
 
   /// The default list of [Uri]s used for checking internet reachability.
-  final List<InternetCheckOption> _defaultCheckOptions = [
+  static final _defaultCheckOptions = List<InternetCheckOption>.unmodifiable([
     InternetCheckOption(uri: Uri.parse('https://one.one.one.one')),
-    InternetCheckOption(uri: Uri.parse('https://icanhazip.com/')),
+    InternetCheckOption(uri: Uri.parse('https://icanhazip.com')),
     InternetCheckOption(
-      uri: Uri.parse('https://jsonplaceholder.typicode.com/todos/1'),
+      uri: Uri.parse(
+        'https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js',
+      ),
     ),
     InternetCheckOption(
-      uri: Uri.parse('https://pokeapi.co/api/v2/ability/?limit=1'),
+      uri: Uri.parse('https://captive.apple.com/internet-check'),
     ),
-  ];
+  ]);
 
   /// The list of [Uri]s used for checking internet reachability.
-  late List<InternetCheckOption> _internetCheckOptions;
+  late final List<InternetCheckOption> _internetCheckOptions;
 
   /// The controller for the internet connection status stream.
   final _statusController = StreamController<InternetStatus>.broadcast();
@@ -132,6 +155,16 @@ class InternetConnection {
   /// outages.
   final bool enableStrictCheck;
 
+  /// Function to check reachability of a single network endpoint.
+  ///
+  /// This can be customized to allow for different ways of checking
+  /// connectivity.
+  final ConnectivityCheckCallback? customConnectivityCheck;
+
+  /// An optional stream that triggers an immediate internet connection check
+  /// whenever it emits an event.
+  final Stream? triggerStream;
+
   /// The last known internet connection status result.
   InternetStatus? _lastStatus;
 
@@ -146,6 +179,10 @@ class InternetConnection {
     InternetCheckOption option,
   ) async {
     try {
+      if (customConnectivityCheck != null) {
+        return customConnectivityCheck!.call(option);
+      }
+
       final response = await http
           .head(option.uri, headers: option.headers)
           .timeout(option.timeout);
@@ -220,31 +257,26 @@ class InternetConnection {
   ///
   /// Updates the status and emits it if there are listeners.
   Future<void> _maybeEmitStatusUpdate() async {
-    _startListeningToConnectivityChanges();
     _timerHandle?.cancel();
-
-    final currentStatus = await internetStatus;
 
     if (!_statusController.hasListener) return;
 
+    final currentStatus = await internetStatus;
+
     if (_lastStatus != currentStatus && _statusController.hasListener) {
+      _lastStatus = currentStatus;
       _statusController.add(currentStatus);
     }
 
     _timerHandle = Timer(_checkInterval, _maybeEmitStatusUpdate);
-
-    _lastStatus = currentStatus;
   }
 
   /// Handles cancellation of status change events.
   ///
   /// Cancels the timer and resets the last status.
-  void _handleStatusChangeCancel() {
-    if (_statusController.hasListener) return;
-
-    _connectivitySubscription?.cancel().then((_) {
-      _connectivitySubscription = null;
-    });
+  Future<void> _handleStatusChangeCancel() async {
+    await _triggerSubscription?.cancel();
+    _triggerSubscription = null;
     _timerHandle?.cancel();
     _timerHandle = null;
     _lastStatus = null;
@@ -254,23 +286,39 @@ class InternetConnection {
   InternetStatus? get lastTryResults => _lastStatus;
 
   /// Stream that emits internet connection status changes.
-  Stream<InternetStatus> get onStatusChange => _statusController.stream;
+  Stream<InternetStatus> get onStatusChange async* {
+    if (_lastStatus != null) {
+      yield _lastStatus!;
+    }
+    yield* _statusController.stream;
+  }
 
   /// Connectivity subscription.
-  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
+  StreamSubscription? _triggerSubscription;
 
-  /// Starts listening to connectivity changes from [connectivity_plus] package
-  /// using the [Connectivity.onConnectivityChanged] stream.
+  /// Starts listening to trigger events from [triggerStream].
+  void _startListeningToTriggerEvents() {
+    if (_triggerSubscription != null) return;
+    if (triggerStream == null) return;
+
+    _triggerSubscription = triggerStream!.listen(
+      (_) => _maybeEmitStatusUpdate(),
+      onError: (_, _) {},
+    );
+  }
+
+  /// Disposes of the resources used by this instance.
   ///
-  /// [connectivity_plus]: https://pub.dev/packages/connectivity_plus
-  void _startListeningToConnectivityChanges() {
-    if (_connectivitySubscription != null) return;
-    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((
-      _,
-    ) {
-      if (_statusController.hasListener) {
-        _maybeEmitStatusUpdate();
-      }
-    }, onError: (_, _) {});
+  /// This method should be called when the instance created by
+  /// [InternetConnection.createInstance] is no longer needed to free up
+  /// resources.
+  ///
+  /// ### Important:
+  /// Do not call this method on the singleton instance. Calling this method on
+  /// the singleton instance will affect all parts of the application that rely
+  /// on it. Use with caution.
+  Future<void> dispose() async {
+    await _handleStatusChangeCancel();
+    await _statusController.close();
   }
 }
